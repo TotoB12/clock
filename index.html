@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch</title>
+    <style>
+        :root {
+            --light-hue: 260deg;
+            --light-saturation: 100%;
+            --light-power: 80%;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+        }
+
+        .watch-container {
+            width: 100vmin;
+            height: 100vmin;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .watch {
+            --dimmer: clamp(10%, var(--light-power), 40%);
+            --light: var(--light-hue) calc(var(--light-saturation) - 40%) calc(var(--light-power) + 35%);
+            --light-dimmed: var(--light-hue) calc(var(--light-saturation) - 90%) var(--dimmer);
+            --light-dark: var(--light-hue) var(--light-saturation) calc(var(--light-power) / 10);
+            filter: drop-shadow(0 10px 50px hsl(0deg 0% 0% / 60%));
+        }
+
+        .screen {
+            --screen-color: hsl(var(--light-hue) clamp(0%, var(--light-saturation), 40%) 2%);
+            position: relative;
+            background-color: var(--screen-color);
+            width: 95vmin;
+            height: 95vmin;
+            border: 2px solid #000;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .clock {
+            width: 85vmin;
+            height: 85vmin;
+            position: relative;
+            z-index: 1;
+        }
+
+        .clock::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            mask-image: radial-gradient(circle at center, transparent 66%, black 66.1%);
+            background-image:
+                repeating-conic-gradient(white 0 0.25%, transparent 0% 8.333333333333%, white 6.25% 6.25%),
+                repeating-conic-gradient(hsl(0deg 0% 100% / 20%) 0% 0.25%, transparent 0% 1.666666%, hsl(0deg 0% 100% / 20%) 1.25% 1.25%);
+        }
+
+        .clock::after {
+            content: '';
+            background-color: white;
+            width: 3.5vmin;
+            height: 3.5vmin;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            mask-image: radial-gradient(circle at center, transparent 33%, black 33.1%);
+        }
+
+        .hand {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: 50% 50%;
+        }
+
+        .hand::after {
+            content: '';
+            height: 3vmin;
+            background-color: white;
+            border-radius: 200px;
+        }
+
+        .hand::before {
+            content: '';
+            background-color: white;
+            height: 1.5vmin;
+            width: 14vmin;
+            margin-right: -5vmin;
+            display: block;
+        }
+
+        .hand-hour::after {
+            width: 18vmin;
+            margin-right: 16.5vmin;
+        }
+
+        .hand-minute::after {
+            width: 35vmin;
+            height: 3vmin;
+            margin-right: 2vmin;
+        }
+
+        .hand-minute::before {
+            width: 10vmin;
+        }
+
+        .hand-second {
+            z-index: 10;
+        }
+
+        .hand-second::before {
+            height: 0.67vmin;
+            width: 48vmin;
+            background-color: orange;
+            z-index: 1;
+            margin-right: 0;
+        }
+
+        .hand-second::after {
+            background-color: var(--screen-color);
+            box-shadow: 0 0 0 0.6vmin orange;
+            width: 1.5vmin;
+            height: 1.5vmin;
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="watch-container">
+        <div class="watch">
+            <div class="screen">
+                <div class="clock">
+                    <div class="hand hand-hour" id="hourHand"></div>
+                    <div class="hand hand-minute" id="minuteHand"></div>
+                    <div class="hand hand-second" id="secondHand"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const hourHand = document.getElementById('hourHand');
+        const minuteHand = document.getElementById('minuteHand');
+        const secondHand = document.getElementById('secondHand');
+
+        function updateClock() {
+            const now = new Date();
+            const milliseconds = now.getMilliseconds();
+            const seconds = now.getSeconds() + milliseconds / 1000;
+            const minutes = now.getMinutes() + seconds / 60;
+            const hours = now.getHours() % 12 + minutes / 60;
+
+            const hourDeg = hours * 30
+            const minuteDeg = minutes * 6;
+            const secondDeg = seconds * 6;
+
+            hourHand.style.transform = `rotate(${hourDeg - 90}deg)`;
+            minuteHand.style.transform = `rotate(${minuteDeg - 90}deg)`;
+            secondHand.style.transform = `rotate(${secondDeg - 90}deg)`;
+
+            requestAnimationFrame(updateClock);
+        }
+
+        requestAnimationFrame(updateClock);
+    </script>
+</body>
+
+</html>
